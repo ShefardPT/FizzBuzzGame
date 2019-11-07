@@ -8,7 +8,7 @@ using FizzBuzz.Services.Interfaces;
 
 namespace FizzBuzz.Tests
 {
-    [TestFixture]
+    [TestFixture, Isolated]
     public class AdvancedAnalizerTests
     {
         IAnalizer _sut;
@@ -17,30 +17,35 @@ namespace FizzBuzz.Tests
         public void Setup()
         {
             _sut = new AdvancedAnalizer();
+
+            var fakeSimpleAnalizer = Isolate.Fake.Instance<SimpleAnalizer>();
+            Isolate.WhenCalled(() => fakeSimpleAnalizer.Analize(0)).WillReturn(new Models.FizzBuzzResult());
+
+            Isolate.NonPublic.InstanceField(_sut, "_simpleAnalizer").Value = fakeSimpleAnalizer;
         }
 
-        [Test, Isolated]
+        [Test]
         public void Should_return_isFizz()
         {
-            var result = _sut.Analize(13);
+            var result = _sut.Analize(33);
 
             Assert.IsTrue(result.IsFizz);
             Assert.IsFalse(result.IsBuzz);
         }
 
-        [Test, Isolated]
+        [Test]
         public void Should_return_isBuzz()
         {
-            var result = _sut.Analize(59);
+            var result = _sut.Analize(50);
 
             Assert.IsTrue(result.IsBuzz);
             Assert.IsFalse(result.IsFizz);
         }
 
-        [Test, Isolated]
+        [Test]
         public void Should_return_isFizz_and_isBuzz()
         {
-            var result = _sut.Analize(53);
+            var result = _sut.Analize(35);
 
             Assert.IsTrue(result.IsFizz);
             Assert.IsTrue(result.IsBuzz);
